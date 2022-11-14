@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Socket io.</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+</head>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background-color: black;
+  }
+
+
+  .glow:before,
+  .glow:after {
+    content: '';
+    position: absolute;
+    left: -2px;
+    top: -2px;
+    background: linear-gradient(to right, #00F260, #0575E6, #00F260);
+    background-size: 400%;
+    width: calc(100% + 4px);
+    height: calc(100% + 4px);
+    z-index: -1;
+    border-radius: 10px;
+    border-radius: inherit;
+    animation: steam 20s infinite alternate;
+  }
+
+
+  @keyframes steam {
+    0% {
+      background-position: 0 0;
+    }
+
+    50% {
+      background-position: 400% 0;
+    }
+
+    100% {
+      background-position: 0 0;
+    }
+  }
+
+  .glow:after {
+    filter: blur(50px);
+  }
+
+  .naam small {
+    display: block;
+    position: relative;
+  }
+
+  .naam small::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    background-color: green;
+    position: absolute;
+    z-index: 999;
+    border-radius: 50%;
+    padding: 2px;
+    left: -10px;
+    top: 7px;
+    border: 1px solid white;
+  }
+
+  .naam {
+    display: none;
+  }
+
+  #msgbox {
+    scroll-behavior: smooth;
+    position: relative;
+    background-image: url(https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1yZWxhdGVkfDF8fHxlbnwwfHx8fA%3D%3D&auto=format&fit=crop&w=500&q=60);
+    background-position: center;
+    background-size: cover;
+  }
+
+  #msgbox::-webkit-scrollbar {
+    display: none;
+  }
+
+  #msgbox #msgitself {
+    width: 30vw;
+    border: 1px solid black;
+    padding: 0.3vw;
+  }
+
+  #msgspace h6 {
+    opacity: .5;
+    position: absolute;
+    bottom: 3%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    z-index: 15;
+  }
+
+  textarea {
+    background-color: white;
+  }
+
+  @media only screen and (max-width: 800px) {
+    #msgbox{
+      position: static;
+    }
+  #parentc .online{
+    position: static;
+    min-width: 120px !important;
+  }
+  #msgbox #msgitself {
+    width: 21vw;
+  }
+  }
+</style>
+
+<body>
+  <div id="overlay" class="container position-fixed d-flex align-items-center justify-content-center"
+    style="background-color: rgba(0, 0, 0, 0.667); height: 100vh; z-index: 12; min-width: 100vw; left: 0;">
+    <div class="card p-3" style="min-width: 20;">
+      <label for="inputPassword5" class="form-label">Fake Name</label>
+      <input type="text" id="inputPassword5" class="form-control" aria-describedby="passwordHelpBlock" autocomplete="off" autofocus>
+      <div id="passwordHelpBlock" class="form-text">
+        Your Name must be fake, contain letters and numbers, and must not contain spaces, special characters, or emoji.
+      </div>
+      <button id="enter" type="button" class="btn btn-warning m-1">Enter the Chat</button>
+    </div>
+  </div>
+
+  <div id="parentc" style="min-height: 100vh;" class="container position-relative">
+
+    <div style="min-width: 250px; background-color: #0B5ED7; position: absolute; z-index: 9; color: white; right: -6%; top: 3%;"
+      class=" p-3 online glow">
+      <small>Online (<span id="onlinenumber"> </span>)</small>
+      <div style="min-width: 10px; background-color: black;" class="naam">
+      </div>
+    </div>
+    <div id="childc1" style="min-height: 80vh; width: 60vw; overflow: auto;" class="container position-relative">
+      <div id="msgspace" class="card p-3 m-2">
+        <h6 style="z-index: 9; color:white; "></h6>
+        <div id="msgbox" class="p-3 overflow-auto" style="height: 79vh;">
+        </div>
+      </div>
+      <div id="childc2" class="container" style="min-height: 20vh;">
+        <form action="">
+          <div class="form-floating">
+            <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea"></textarea>
+            <label for="floatingTextarea">Write your message</label>
+          </div>
+          <button id="send" type="button" class="btn btn-primary btn-sm mt-1" style="min-width: 100%;">Send
+            Message</button>
+        </form>
+      </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.2/socket.io.js"
+      integrity="sha512-VJ6+sp2E5rFQk05caiXXzQd1wBABpjEj1r5kMiLmGAAgwPItw1YpqsCCBtq8Yr1x6C49/mTpRdXtq8O2RcZhlQ=="
+      crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
+      crossorigin="anonymous"></script>
+    <script>
+      var socket = io();
+      let name = "Unknown user";
+      document.querySelector("#enter").addEventListener("click", function () {
+        if (document.querySelector("input").value.trim().length > 1) {
+          name = document.querySelector("input").value;
+          document.querySelector("#overlay").classList.add("d-none");
+          socket.emit("naam", name);
+        }
+      })
+      var clutter = `<hr>`
+
+      socket.on("onlineusers", function (data) {
+        document.querySelector("#onlinenumber").textContent = data.length;
+
+        clutter = `<hr>`
+        data.forEach(function (elem) {
+          clutter += `<small>${elem}</small>`
+        })
+        document.querySelector(".naam").innerHTML = clutter;
+
+        document.querySelector(".online").addEventListener("click", function () {
+          var flag = 0;
+          document.querySelector(".naam").style.display = "initial";
+        });
+      })
+
+      var timeout;
+      document.querySelector("textarea").addEventListener("input", function () {
+        socket.emit("typing");
+      })
+      socket.on("typingname", function (data) {
+        document.querySelector("#msgspace h6").innerHTML = `<i>${data.username}</i> is typing.`
+        clearTimeout(timeout);
+        timeout = setTimeout(function () {
+          document.querySelector("#msgspace h6").innerHTML = "";
+        }, 1500)
+      })
+
+      document.querySelector("#send").addEventListener("click", function () {
+        if (document.querySelector("textarea").value.trim().length > 1) {
+          socket.emit("eventkanaam", document.querySelector("textarea").value);
+
+          var mymsg = document.querySelector("textarea").value;
+          document.querySelector("#msgbox").innerHTML += `<div id="msgitself" class="bg bg-info text-light card m-1  minemsg" style="float: right;"><span>${name} : </span> ${mymsg}</div>`
+          var objDiv = document.querySelector("#msgbox");
+          objDiv.scrollTop = objDiv.scrollHeight;
+
+          document.querySelector("textarea").value = " ";
+        }
+        else {
+          alert("Enter message !");
+        }
+      })
+
+      socket.on("eventkanaam", function (data) {
+        document.querySelector("#msgbox").innerHTML += `<div id="msgitself" class="bg card m-1"><span>${data.userName}: </span> ${data.msg}</div>`
+        var objDiv = document.querySelector("#msgbox");
+        objDiv.scrollTop = objDiv.scrollHeight;
+      })
+
+    </script>
+</body>
+
+</html>
