@@ -4,10 +4,10 @@
  * Module dependencies.
  */
 
-var app = require('../app');
+var app = require('../app.js');
 var debug = require('debug')('socket:server');
 var http = require('http');
-let socketApi = require('../socketApi');
+let socketApi = require('../socketApi.js');
 
 /**
  * Get port from environment and store in Express.
