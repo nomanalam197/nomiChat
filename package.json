@@ -8,6 +8,10 @@
   "engines": {
     "node":"16.15.1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nomanalam197/nomiChat.git"
+  },
   "dependencies": {
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
